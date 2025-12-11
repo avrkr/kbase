@@ -1,4 +1,26 @@
-const getEmailTemplate = (title, content) => {
+const getEmailTemplate = (title, content, dataItems = [], footerText = '') => {
+  let mainContent = content;
+
+  // If dataItems are provided, we assume 'content' is just the intro text, 
+  // and we need to build the info box.
+  if (dataItems && dataItems.length > 0) {
+    mainContent = `<p>${content}</p>`;
+    
+    mainContent += `<div class="info-box">`;
+    dataItems.forEach(item => {
+      mainContent += `
+        <div class="label">${item.label}</div>
+        <div class="value">${item.value}</div>
+        <br>
+      `;
+    });
+    mainContent += `</div>`;
+
+    if (footerText) {
+      mainContent += `<p>${footerText}</p>`;
+    }
+  }
+
   return `
     <!DOCTYPE html>
     <html>
@@ -93,7 +115,7 @@ const getEmailTemplate = (title, content) => {
         </div>
         <div class="content">
           <h1>${title}</h1>
-          ${content}
+          ${mainContent}
         </div>
         <div class="footer">
           &copy; ${new Date().getFullYear()} kbase. All rights reserved.
