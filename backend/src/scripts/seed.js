@@ -19,11 +19,11 @@ const importData = async () => {
     await Banner.deleteMany();
 
     const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash('13429@Rahul', salt);
+    const passwordHash = await bcrypt.hash('12345667', salt);
 
     const superAdmin = await User.create({
       name: 'Super Admin',
-      email: 'rahul@vitelglobal.com',
+      email: 'test@gmail.com',
       passwordHash,
       role: 'superadmin',
     });
