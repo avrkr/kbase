@@ -1,23 +1,27 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { User, Mail, ArrowRight, CheckCircle } from 'lucide-react';
+import { User, Mail, ArrowRight, CheckCircle, Loader } from 'lucide-react';
 
 const Signup = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { signup } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await signup(name, email);
       setSuccess(true);
     } catch (err) {
       setError(err.response?.data?.message || 'Signup failed');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -91,9 +95,19 @@ const Signup = () => {
             
             <button
               type="submit"
-              className="btn btn-primary w-full py-2.5 shadow-lg shadow-primary-500/20"
+              disabled={loading}
+              className="btn btn-primary w-full py-2.5 shadow-lg shadow-primary-500/20 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              Create Account <ArrowRight size={18} className="ml-2" />
+              {loading ? (
+                <span className="flex items-center justify-center">
+                  <Loader className="animate-spin mr-2" size={18} />
+                  Creating Account...
+                </span>
+              ) : (
+                <span className="flex items-center justify-center">
+                  Create Account <ArrowRight size={18} className="ml-2" />
+                </span>
+              )}
             </button>
           </form>
           

@@ -1,5 +1,6 @@
 const Contact = require('../models/Contact');
 const sendEmail = require('../utils/email');
+const getEmailTemplate = require('../utils/emailTemplate');
 
 // @desc    Submit a contact form
 // @route   POST /api/contact
@@ -20,42 +21,30 @@ const submitContact = async (req, res) => {
   });
 
   // Send email to admin
-  const emailMessage = `
-    You have received a new contact form submission:
-    
-    Name: ${name}
-    Email: ${email}
-    Subject: ${subject}
-    
-    Message:
-    ${message}
-  `;
-  
-  const html = `
-    <h1>New Contact Form Submission</h1>
-    <p><strong>Name:</strong> ${name}</p>
-    <p><strong>Email:</strong> ${email}</p>
-    <p><strong>Subject:</strong> ${subject}</p>
-    <br/>
-    <p><strong>Message:</strong></p>
-    <p>${message.replace(/\n/g, '<br>')}</p>
-  `;
+const html = getEmailTemplate(
+  'New Contact Form Submission',
+  `You have received a new contact form submission from <strong>${name}</strong> (${email}).`,
+  [
+    { label: 'Subject', value: subject },
+    { label: 'Message', value: message.replace(/\n/g, '<br>') }
+  ]
+);
 
-  try {
-    const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_EMAIL;
-    
-    await sendEmail({
-      email: adminEmail,
-      subject: `Contact Form: ${subject}`,
-      message: emailMessage,
-      html: html
-    });
-  } catch (error) {
-    console.error('Email sending failed:', error);
-    // We don't fail the request if email fails, as we saved it to DB
-  }
+try {
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_EMAIL;
 
-  res.status(201).json(contact);
+  await sendEmail({
+    email: adminEmail,
+    subject: `Contact Form: ${subject}`,
+    html: html, // Use the template HTML
+  });
+
+} catch (error) {
+  console.error('Email sending failed:', error);
+  // We don't fail the request if email fails, as we saved it to DB
+}
+
+res.status(201).json(contact);
 };
 
 // @desc    Get all contact messages

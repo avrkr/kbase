@@ -15,14 +15,16 @@ import TermsOfService from './pages/TermsOfService';
 import ContactSupport from './pages/ContactSupport';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import ChatWidget from './components/ChatWidget';
 
 function App() {
   return (
     <AuthProvider>
-      <ChatWidget />
-      <Routes>
-        <Route path="/" element={<Layout />}>
+      <ThemeProvider>
+        <ChatWidget />
+        <Routes>
+          <Route path="/" element={<Layout />}>
           {/* Public Routes */}
           <Route index element={<Home />} />
           <Route path="login" element={<Login />} />
@@ -45,10 +47,9 @@ function App() {
           <Route element={<ProtectedRoute roles={['admin', 'superadmin']} />}>
             <Route path="admin" element={<AdminDashboard />} />
           </Route>
-        </Route>
-      </Routes>
+          </Route>
+        </Routes>
+      </ThemeProvider>
     </AuthProvider>
   );
-}
-
-export default App;
+}export default App;

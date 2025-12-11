@@ -1,22 +1,26 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
-import { Mail, Lock, ArrowRight } from 'lucide-react';
+import { Mail, Lock, ArrowRight, Loader } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
       await login(email, password);
       navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -76,9 +80,19 @@ const Login = () => {
 
             <button
               type="submit"
-              className="btn btn-primary w-full py-2.5 shadow-lg shadow-primary-500/20"
+              disabled={loading}
+              className="btn btn-primary w-full py-2.5 shadow-lg shadow-primary-500/20 disabled:opacity-70 disabled:cursor-not-allowed"
             >
-              Sign In <ArrowRight size={18} className="ml-2" />
+              {loading ? (
+                <span className="flex items-center justify-center">
+                  <Loader className="animate-spin mr-2" size={18} />
+                  Signing in...
+                </span>
+              ) : (
+                <span className="flex items-center justify-center">
+                  Sign In <ArrowRight size={18} className="ml-2" />
+                </span>
+              )}
             </button>
           </form>
           

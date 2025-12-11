@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-primary-50: #eef2ff;
   --color-primary-100: #e0e7ff;
@@ -22,10 +24,10 @@
 
 @layer base {
   body {
-    @apply bg-background text-slate-900 antialiased;
+    @apply bg-background text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased;
   }
   h1, h2, h3, h4, h5, h6 {
-    @apply font-bold tracking-tight text-slate-900;
+    @apply font-bold tracking-tight text-slate-900 dark:text-slate-100;
   }
 }
 
@@ -37,16 +39,16 @@
     @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
   }
   .btn-secondary {
-    @apply bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 focus:ring-slate-500;
+    @apply bg-white text-slate-700 border border-slate-300 hover:bg-slate-50 focus:ring-slate-500 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-700 dark:hover:bg-slate-700;
   }
   .btn-danger {
     @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
   }
   .input-field {
-    @apply w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition-all duration-200;
+    @apply w-full px-4 py-2 rounded-lg border border-slate-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-200 outline-none transition-all duration-200 dark:bg-slate-900 dark:border-slate-700 dark:text-white dark:focus:ring-primary-900;
   }
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden;
+    @apply bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden dark:bg-slate-900 dark:border-slate-800;
   }
 }
 

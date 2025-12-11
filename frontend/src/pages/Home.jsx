@@ -76,7 +76,7 @@ const Home = () => {
         {/* Main Content */}
         <div className="flex-1">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-            <h1 className="text-3xl font-bold text-slate-800">Latest Articles</h1>
+            <h1 className="text-3xl font-bold text-slate-800 dark:text-slate-100">Latest Articles</h1>
             
             <form onSubmit={handleSearch} className="relative w-full sm:w-72">
               <input
@@ -86,23 +86,23 @@ const Home = () => {
                 onChange={(e) => setKeyword(e.target.value)}
                 className="input-field pl-10"
               />
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={18} />
             </form>
           </div>
 
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {[1, 2, 3, 4].map((n) => (
-                <div key={n} className="h-64 bg-slate-100 rounded-xl animate-pulse"></div>
+                <div key={n} className="h-64 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse"></div>
               ))}
             </div>
           ) : posts.length === 0 ? (
-            <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-300">
-              <div className="mx-auto w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-                <Search className="text-slate-400" size={24} />
+            <div className="text-center py-20 bg-white dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
+              <div className="mx-auto w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+                <Search className="text-slate-400 dark:text-slate-500" size={24} />
               </div>
-              <h3 className="text-lg font-medium text-slate-900">No articles found</h3>
-              <p className="text-slate-500">Try adjusting your search or category filter.</p>
+              <h3 className="text-lg font-medium text-slate-900 dark:text-slate-100">No articles found</h3>
+              <p className="text-slate-500 dark:text-slate-400">Try adjusting your search or category filter.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -110,37 +110,37 @@ const Home = () => {
                 <Link 
                   to={`/post/${post._id}`} 
                   key={post._id} 
-                  className="group card hover:shadow-md hover:border-primary-200 transition-all duration-300 flex flex-col h-full"
+                  className="group card hover:shadow-md hover:border-primary-200 dark:hover:border-primary-800 transition-all duration-300 flex flex-col h-full"
                 >
                   <div className="p-6 flex flex-col h-full">
                     <div className="flex items-center gap-2 mb-4">
-                      <span className="px-3 py-1 bg-primary-50 text-primary-700 text-xs font-semibold rounded-full uppercase tracking-wide">
+                      <span className="px-3 py-1 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 text-xs font-semibold rounded-full uppercase tracking-wide">
                         {post.categoryId?.name || 'General'}
                       </span>
-                      <span className="text-slate-400 text-xs flex items-center gap-1">
+                      <span className="text-slate-400 dark:text-slate-500 text-xs flex items-center gap-1">
                         <Calendar size={12} />
                         {format(new Date(post.createdAt), 'MMM d, yyyy')}
                       </span>
                     </div>
                     
-                    <h3 className="text-xl font-bold mb-3 text-slate-800 group-hover:text-primary-600 transition-colors line-clamp-2">
+                    <h3 className="text-xl font-bold mb-3 text-slate-800 dark:text-slate-100 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors line-clamp-2">
                       {post.title}
                     </h3>
                     
-                    <p className="text-slate-600 mb-6 line-clamp-3 flex-1">
+                    <p className="text-slate-600 dark:text-slate-400 mb-6 line-clamp-3 flex-1">
                       {post.content.substring(0, 150)}...
                     </p>
                     
-                    <div className="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
+                    <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800 mt-auto">
                       <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500">
+                        <div className="w-8 h-8 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-500 dark:text-slate-400">
                           <User size={14} />
                         </div>
-                        <span className="text-sm font-medium text-slate-700">
+                        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
                           {post.authorId?.name || 'Unknown'}
                         </span>
                       </div>
-                      <span className="text-primary-600 text-sm font-medium flex items-center gap-1 group-hover:translate-x-1 transition-transform">
+                      <span className="text-primary-600 dark:text-primary-400 text-sm font-medium flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                         Read <ArrowRight size={14} />
                       </span>
                     </div>

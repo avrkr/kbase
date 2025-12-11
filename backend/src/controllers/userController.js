@@ -2,6 +2,7 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const sendEmail = require('../utils/email');
+const getEmailTemplate = require('../utils/emailTemplate');
 
 // @desc    Get all users
 // @route   GET /api/users
@@ -58,19 +59,25 @@ const createUser = async (req, res) => {
   });
 
   if (user) {
-    const message = `Your account has been created by an admin.\n\nEmail: ${email}\nPassword: ${password}\n\nPlease login and change your password.`;
-    const html = `
-      <h1>Account Created</h1>
+    const htmlContent = `
       <p>Your account has been created by an admin.</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Password:</strong> ${password}</p>
-      <p>Please login and change your password.</p>
+      
+      <div class="info-box">
+        <div class="label">Email Address</div>
+        <div class="value">${email}</div>
+        <br>
+        <div class="label">Password</div>
+        <div class="value">${password}</div>
+      </div>
+      
+      <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/login" class="button">Login to Dashboard</a>
     `;
+
+    const html = getEmailTemplate('Account Created', htmlContent);
 
     await sendEmail({
       email: user.email,
       subject: 'kbase - Account Created',
-      message,
       html,
     });
 
@@ -161,18 +168,30 @@ const createAdmin = async (req, res) => {
   });
 
   if (user) {
-    const message = `You have been added as an Admin.\n\nEmail: ${email}\nPassword: ${password}\n\nPlease login and change your password.`;
-    const html = `
-      <h1>Admin Account Created</h1>
-      <p>You have been added as an Admin.</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Password:</strong> ${password}</p>
-      <p>Please login and change your password.</p>
+    const message = `Welcome to kbase! Your account has been created.\n\nEmail: ${email}\nPassword: ${password}`;
+    
+    const htmlContent = `
+      <p>Welcome to kbase! Your account has been successfully created.</p>
+      <p>Here are your login credentials:</p>
+      
+      <div class="info-box">
+        <div class="label">Email Address</div>
+        <div class="value">${email}</div>
+        <br>
+        <div class="label">Password</div>
+        <div class="value">${password}</div>
+      </div>
+      
+      <p>You can now log in to your dashboard using these credentials.</p>
+      
+      <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/login" class="button">Login to Dashboard</a>
     `;
+
+    const html = getEmailTemplate('Welcome to kbase', htmlContent);
 
     await sendEmail({
       email: user.email,
-      subject: 'kbase - Admin Access Granted',
+      subject: 'Welcome to kbase - Your Account Details',
       message,
       html,
     });
@@ -211,15 +230,22 @@ const contactSupport = async (req, res) => {
     ${message}
   `;
   
-  const html = `
-    <h1>New Contact Form Submission</h1>
-    <p><strong>Name:</strong> ${name}</p>
-    <p><strong>Email:</strong> ${email}</p>
-    <p><strong>Subject:</strong> ${subject}</p>
-    <br/>
+  const htmlContent = `
+    <p>You have received a new message from the contact form.</p>
+    
+    <div class="info-box">
+      <div class="label">From</div>
+      <div class="value">${name} (${email})</div>
+      <br>
+      <div class="label">Subject</div>
+      <div class="value">${subject}</div>
+    </div>
+    
     <p><strong>Message:</strong></p>
-    <p>${message.replace(/\n/g, '<br>')}</p>
+    <p style="background-color: #f1f5f9; padding: 16px; border-radius: 8px;">${message.replace(/\n/g, '<br>')}</p>
   `;
+
+  const html = getEmailTemplate('New Contact Message', htmlContent);
 
   try {
     const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_EMAIL;

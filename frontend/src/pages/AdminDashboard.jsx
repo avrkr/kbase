@@ -15,7 +15,8 @@ import {
   Plus,
   ExternalLink,
   MessageSquare,
-  Reply
+  Reply,
+  Loader
 } from 'lucide-react';
 
 const AdminDashboard = () => {
@@ -27,6 +28,7 @@ const AdminDashboard = () => {
   const [categories, setCategories] = useState([]);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [createAdminLoading, setCreateAdminLoading] = useState(false);
 
   // New Banner State
   const [newBanner, setNewBanner] = useState({ title: '', content: '', link: '', visibleFrom: '', visibleTo: '' });
@@ -111,9 +113,17 @@ const AdminDashboard = () => {
 
   const handleCreateAdmin = async (e) => {
     e.preventDefault();
-    await api.post('/admins', newAdmin);
-    setNewAdmin({ name: '', email: '' });
-    alert('Admin created and email sent');
+    setCreateAdminLoading(true);
+    try {
+      await api.post('/admins', newAdmin);
+      setNewAdmin({ name: '', email: '' });
+      alert('Admin created and email sent');
+    } catch (error) {
+      console.error(error);
+      alert('Failed to create admin');
+    } finally {
+      setCreateAdminLoading(false);
+    }
   };
 
   const handleReplyMessage = async (e) => {
@@ -457,8 +467,19 @@ const AdminDashboard = () => {
                         <label className="block text-sm font-medium text-slate-700 mb-1">Email</label>
                         <input type="email" value={newAdmin.email} onChange={e => setNewAdmin({...newAdmin, email: e.target.value})} className="input-field" required />
                       </div>
-                      <button type="submit" className="btn btn-primary w-full">
-                        Create Admin & Send Email
+                      <button 
+                        type="submit" 
+                        disabled={createAdminLoading}
+                        className="btn btn-primary w-full disabled:opacity-70 disabled:cursor-not-allowed"
+                      >
+                        {createAdminLoading ? (
+                          <span className="flex items-center justify-center">
+                            <Loader className="animate-spin mr-2" size={18} />
+                            Creating Admin...
+                          </span>
+                        ) : (
+                          'Create Admin & Send Email'
+                        )}
                       </button>
                     </form>
                   </div>

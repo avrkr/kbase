@@ -99,51 +99,51 @@ const PostDetail = () => {
     <div className="max-w-4xl mx-auto">
       <Link 
         to="/" 
-        className="inline-flex items-center text-sm text-slate-500 hover:text-primary-600 transition-colors mb-6"
+        className="inline-flex items-center text-sm text-slate-500 dark:text-slate-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors mb-6"
       >
         <ArrowLeft size={16} className="mr-1" /> Back to Articles
       </Link>
 
-      <article className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+      <article className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 overflow-hidden">
         {/* Header */}
-        <header className="p-8 border-b border-slate-100 bg-slate-50/50">
+        <header className="p-8 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
           <div className="flex flex-wrap items-center gap-3 mb-6">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-primary-50 text-primary-700 border border-primary-100">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 border border-primary-100 dark:border-primary-800">
               <Folder size={12} /> {post.categoryId?.name || 'Uncategorized'}
             </span>
-            <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
+            <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
               <Calendar size={12} /> {format(new Date(post.createdAt), 'MMMM d, yyyy')}
             </span>
-            <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
+            <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
               <Clock size={12} /> {format(new Date(post.createdAt), 'h:mm a')}
             </span>
-            <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 ml-auto">
+            <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 ml-auto">
               <Eye size={14} /> {post.views || 0} Views
             </span>
           </div>
 
-          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 leading-tight">
+          <h1 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-6 leading-tight">
             {post.title}
           </h1>
 
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-500 border border-slate-300">
+            <div className="w-10 h-10 bg-slate-200 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-500 dark:text-slate-400 border border-slate-300 dark:border-slate-700">
               <User size={20} />
             </div>
             <div>
-              <div className="font-medium text-slate-900">{post.authorId?.name || 'Unknown Author'}</div>
-              <div className="text-xs text-slate-500">Author</div>
+              <div className="font-medium text-slate-900 dark:text-slate-100">{post.authorId?.name || 'Unknown Author'}</div>
+              <div className="text-xs text-slate-500 dark:text-slate-400">Author</div>
             </div>
           </div>
         </header>
 
         {/* Content */}
-        <div className="p-8 md:p-10 prose prose-slate max-w-none prose-headings:font-bold prose-a:text-primary-600 hover:prose-a:text-primary-700 prose-img:rounded-xl border-b border-slate-100">
+        <div className="p-8 md:p-10 prose prose-slate dark:prose-invert max-w-none prose-headings:font-bold prose-a:text-primary-600 dark:prose-a:text-primary-400 hover:prose-a:text-primary-700 dark:hover:prose-a:text-primary-300 prose-img:rounded-xl border-b border-slate-100 dark:border-slate-800">
           <ReactMarkdown>{post.content}</ReactMarkdown>
         </div>
 
         {/* Actions & Comments */}
-        <div className="p-8 bg-slate-50/50">
+        <div className="p-8 bg-slate-50/50 dark:bg-slate-900/50">
           {/* Like Button */}
           <div className="flex items-center gap-4 mb-8">
             <button
@@ -151,19 +151,19 @@ const PostDetail = () => {
               disabled={!user}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                 user && post.likes?.includes(user._id)
-                  ? 'bg-primary-100 text-primary-700'
-                  : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+                  ? 'bg-primary-100 dark:bg-primary-900/50 text-primary-700 dark:text-primary-400'
+                  : 'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700'
               } ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               <ThumbsUp size={18} className={user && post.likes?.includes(user._id) ? 'fill-current' : ''} />
               {post.likes?.length || 0} Likes
             </button>
-            {!user && <span className="text-sm text-slate-500">Login to like and comment</span>}
+            {!user && <span className="text-sm text-slate-500 dark:text-slate-400">Login to like and comment</span>}
           </div>
 
           {/* Comments Section */}
           <div className="space-y-8">
-            <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+            <h3 className="text-xl font-bold text-slate-900 dark:text-slate-100 flex items-center gap-2">
               <MessageSquare size={20} />
               Comments ({post.comments?.length || 0})
             </h3>
@@ -171,7 +171,7 @@ const PostDetail = () => {
             {/* Comment Form */}
             {user && (
               <form onSubmit={handleCommentSubmit} className="flex gap-4">
-                <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center text-primary-700 font-bold shrink-0">
+                <div className="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center text-primary-700 dark:text-primary-400 font-bold shrink-0">
                   {user.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1">
@@ -179,7 +179,7 @@ const PostDetail = () => {
                     value={commentText}
                     onChange={(e) => setCommentText(e.target.value)}
                     placeholder="Write a comment..."
-                    className="w-full p-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 min-h-[80px] bg-white"
+                    className="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 min-h-[80px] bg-white dark:bg-slate-800 dark:text-slate-100"
                     required
                   />
                   <div className="flex justify-end mt-2">
@@ -204,22 +204,22 @@ const PostDetail = () => {
             <div className="space-y-6">
               {post.comments?.map((comment, index) => (
                 <div key={index} className="flex gap-4">
-                  <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 font-bold shrink-0">
+                  <div className="w-10 h-10 bg-slate-200 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-600 dark:text-slate-400 font-bold shrink-0">
                     {comment.user?.name?.charAt(0).toUpperCase() || '?'}
                   </div>
-                  <div className="flex-1 bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                  <div className="flex-1 bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm">
                     <div className="flex justify-between items-start mb-2">
-                      <span className="font-semibold text-slate-900">{comment.user?.name || 'Unknown User'}</span>
-                      <span className="text-xs text-slate-500">
+                      <span className="font-semibold text-slate-900 dark:text-slate-100">{comment.user?.name || 'Unknown User'}</span>
+                      <span className="text-xs text-slate-500 dark:text-slate-400">
                         {format(new Date(comment.createdAt), 'MMM d, yyyy h:mm a')}
                       </span>
                     </div>
-                    <p className="text-slate-700 whitespace-pre-wrap">{comment.text}</p>
+                    <p className="text-slate-700 dark:text-slate-300 whitespace-pre-wrap">{comment.text}</p>
                   </div>
                 </div>
               ))}
               {post.comments?.length === 0 && (
-                <p className="text-slate-500 italic">No comments yet. Be the first to share your thoughts!</p>
+                <p className="text-slate-500 dark:text-slate-400 italic">No comments yet. Be the first to share your thoughts!</p>
               )}
             </div>
           </div>

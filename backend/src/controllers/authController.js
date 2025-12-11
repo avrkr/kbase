@@ -2,6 +2,7 @@ const User = require('../models/User');
 const OTP = require('../models/OTP');
 const generateToken = require('../utils/generateToken');
 const sendEmail = require('../utils/email');
+const getEmailTemplate = require('../utils/emailTemplate');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
@@ -31,22 +32,26 @@ const registerUser = async (req, res) => {
 
   if (user) {
     // Send email with credentials
-    const message = `Welcome to kbase! Your account has been created.\n\nEmail: ${email}\nPassword: ${password}\n\nPlease login and change your password immediately.`;
-    const html = `
-      <h1>Welcome to kbase</h1>
-      <p>Your account has been created.</p>
-      <p><strong>Email:</strong> ${email}</p>
-      <p><strong>Password:</strong> ${password}</p>
-      <p>Please login and change your password immediately.</p>
-      <br/>
-      <p>kbase Team</p>
+    const htmlContent = `
+      <p>Welcome to kbase! Your account has been created.</p>
+      
+      <div class="info-box">
+        <div class="label">Email Address</div>
+        <div class="value">${email}</div>
+        <br>
+        <div class="label">Password</div>
+        <div class="value">${password}</div>
+      </div>
+      
+      <a href="${process.env.CLIENT_URL || 'http://localhost:5173'}/login" class="button">Login to Dashboard</a>
     `;
+
+    const html = getEmailTemplate('Welcome to kbase', htmlContent);
 
     try {
       await sendEmail({
         email: user.email,
         subject: 'Welcome to kbase - Your Account Details',
-        message,
         html,
       });
     } catch (error) {
