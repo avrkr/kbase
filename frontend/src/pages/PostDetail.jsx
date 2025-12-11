@@ -3,20 +3,28 @@ import { useParams, Link } from 'react-router-dom';
 import api from '../utils/api';
 import ReactMarkdown from 'react-markdown';
 import { format } from 'date-fns';
+import { useAuth } from '../context/AuthContext';
 import { 
   Calendar, 
   User, 
   Folder, 
   ArrowLeft, 
   Clock,
-  AlertCircle
+  AlertCircle,
+  Eye,
+  ThumbsUp,
+  MessageSquare,
+  Send
 } from 'lucide-react';
 
 const PostDetail = () => {
   const { id } = useParams();
+  const { user } = useAuth();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [commentText, setCommentText] = useState('');
+  const [submittingComment, setSubmittingComment] = useState(false);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -32,6 +40,35 @@ const PostDetail = () => {
 
     fetchPost();
   }, [id]);
+
+  const handleLike = async () => {
+    try {
+      const { data } = await api.post(`/posts/${id}/like`);
+      setPost(prev => ({ ...prev, likes: data }));
+    } catch (error) {
+      console.error('Error liking post:', error);
+    }
+  };
+
+  const handleCommentSubmit = async (e) => {
+    e.preventDefault();
+    if (!commentText.trim()) return;
+
+    setSubmittingComment(true);
+    try {
+      const { data } = await api.post(`/posts/${id}/comment`, { text: commentText });
+      setPost(prev => ({
+        ...prev,
+        comments: [...prev.comments, data]
+      }));
+      setCommentText('');
+    } catch (error) {
+      console.error('Error submitting comment:', error);
+      alert('Failed to submit comment');
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -80,6 +117,9 @@ const PostDetail = () => {
             <span className="inline-flex items-center gap-1.5 text-xs text-slate-500">
               <Clock size={12} /> {format(new Date(post.createdAt), 'h:mm a')}
             </span>
+            <span className="inline-flex items-center gap-1.5 text-xs text-slate-500 ml-auto">
+              <Eye size={14} /> {post.views || 0} Views
+            </span>
           </div>
 
           <h1 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6 leading-tight">
@@ -98,8 +138,91 @@ const PostDetail = () => {
         </header>
 
         {/* Content */}
-        <div className="p-8 md:p-10 prose prose-slate max-w-none prose-headings:font-bold prose-a:text-primary-600 hover:prose-a:text-primary-700 prose-img:rounded-xl">
+        <div className="p-8 md:p-10 prose prose-slate max-w-none prose-headings:font-bold prose-a:text-primary-600 hover:prose-a:text-primary-700 prose-img:rounded-xl border-b border-slate-100">
           <ReactMarkdown>{post.content}</ReactMarkdown>
+        </div>
+
+        {/* Actions & Comments */}
+        <div className="p-8 bg-slate-50/50">
+          {/* Like Button */}
+          <div className="flex items-center gap-4 mb-8">
+            <button
+              onClick={handleLike}
+              disabled={!user}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                user && post.likes?.includes(user._id)
+                  ? 'bg-primary-100 text-primary-700'
+                  : 'bg-white border border-slate-200 text-slate-600 hover:bg-slate-50'
+              } ${!user ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              <ThumbsUp size={18} className={user && post.likes?.includes(user._id) ? 'fill-current' : ''} />
+              {post.likes?.length || 0} Likes
+            </button>
+            {!user && <span className="text-sm text-slate-500">Login to like and comment</span>}
+          </div>
+
+          {/* Comments Section */}
+          <div className="space-y-8">
+            <h3 className="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <MessageSquare size={20} />
+              Comments ({post.comments?.length || 0})
+            </h3>
+
+            {/* Comment Form */}
+            {user && (
+              <form onSubmit={handleCommentSubmit} className="flex gap-4">
+                <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center text-primary-700 font-bold shrink-0">
+                  {user.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="flex-1">
+                  <textarea
+                    value={commentText}
+                    onChange={(e) => setCommentText(e.target.value)}
+                    placeholder="Write a comment..."
+                    className="w-full p-3 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 min-h-[80px] bg-white"
+                    required
+                  />
+                  <div className="flex justify-end mt-2">
+                    <button
+                      type="submit"
+                      disabled={submittingComment || !commentText.trim()}
+                      className="btn btn-primary btn-sm flex items-center gap-2"
+                    >
+                      {submittingComment ? (
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <Send size={16} />
+                      )}
+                      Post Comment
+                    </button>
+                  </div>
+                </div>
+              </form>
+            )}
+
+            {/* Comments List */}
+            <div className="space-y-6">
+              {post.comments?.map((comment, index) => (
+                <div key={index} className="flex gap-4">
+                  <div className="w-10 h-10 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 font-bold shrink-0">
+                    {comment.user?.name?.charAt(0).toUpperCase() || '?'}
+                  </div>
+                  <div className="flex-1 bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                    <div className="flex justify-between items-start mb-2">
+                      <span className="font-semibold text-slate-900">{comment.user?.name || 'Unknown User'}</span>
+                      <span className="text-xs text-slate-500">
+                        {format(new Date(comment.createdAt), 'MMM d, yyyy h:mm a')}
+                      </span>
+                    </div>
+                    <p className="text-slate-700 whitespace-pre-wrap">{comment.text}</p>
+                  </div>
+                </div>
+              ))}
+              {post.comments?.length === 0 && (
+                <p className="text-slate-500 italic">No comments yet. Be the first to share your thoughts!</p>
+              )}
+            </div>
+          </div>
         </div>
       </article>
     </div>

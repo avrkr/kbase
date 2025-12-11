@@ -62,7 +62,8 @@ const getPosts = async (req, res) => {
 const getPostById = async (req, res) => {
   const post = await Post.findById(req.params.id)
     .populate('authorId', 'name')
-    .populate('categoryId', 'name');
+    .populate('categoryId', 'name')
+    .populate('comments.user', 'name');
 
   if (post) {
     // Check visibility
@@ -71,6 +72,10 @@ const getPostById = async (req, res) => {
       (req.user && (req.user.role === 'admin' || req.user.role === 'superadmin')) ||
       (req.user && req.user._id.toString() === post.authorId._id.toString())
     ) {
+      // Increment views
+      post.views = (post.views || 0) + 1;
+      await post.save();
+      
       res.json(post);
     } else {
       res.status(404);
@@ -244,11 +249,65 @@ const rejectPost = async (req, res) => {
   }
 };
 
+// @desc    Like a post
+// @route   POST /api/posts/:id/like
+// @access  Private
+const likePost = async (req, res) => {
+  const post = await Post.findById(req.params.id);
+
+  if (post) {
+    if (post.likes.includes(req.user._id)) {
+      // Unlike
+      post.likes = post.likes.filter((id) => id.toString() !== req.user._id.toString());
+    } else {
+      // Like
+      post.likes.push(req.user._id);
+    }
+    await post.save();
+    res.json(post.likes);
+  } else {
+    res.status(404);
+    throw new Error('Post not found');
+  }
+};
+
+// @desc    Add a comment
+// @route   POST /api/posts/:id/comment
+// @access  Private
+const addComment = async (req, res) => {
+  const { text } = req.body;
+  const post = await Post.findById(req.params.id);
+
+  if (post) {
+    const comment = {
+      user: req.user._id,
+      text,
+    };
+
+    post.comments.push(comment);
+    await post.save();
+    
+    // Populate user info for the new comment
+    const updatedPost = await Post.findById(req.params.id).populate('comments.user', 'name');
+    const newComment = updatedPost.comments[updatedPost.comments.length - 1];
+
+    res.status(201).json(newComment);
+  } else {
+    res.status(404);
+    throw new Error('Post not found');
+  }
+};
+
 module.exports = {
   getPosts,
   getPostById,
   createPost,
   updatePost,
+  deletePost,
+  approvePost,
+  rejectPost,
+  likePost,
+  addComment,
   deletePost,
   approvePost,
   rejectPost,
